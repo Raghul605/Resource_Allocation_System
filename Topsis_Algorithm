@@ -1,0 +1,109 @@
+<?php
+session_start();
+include('config/config.php');
+$i=0;$j=0;
+$arr=array();
+$w=array();
+$sql1="SELECT * FROM donator where approval='Yes'";
+    $query=mysqli_query($db,$sql1);
+    $m=mysqli_num_rows($query);
+    if(mysqli_num_rows($query)>0){
+    while ($rows=mysqli_fetch_assoc($query)) {
+        $don_id=$rows['donator_id'];
+      $i=$i+1;
+      $w[$i]=0;
+    $sql2="SELECT * FROM donatelist";
+    $query1=mysqli_query($db,$sql2);
+    $n=mysqli_num_rows($query1);
+    if(mysqli_num_rows($query1)>0){
+    while ($rows1=mysqli_fetch_assoc($query1)) {
+      $j=$j+1;
+      $r_id=$rows1['request_id'];
+      
+      $dl_id=$rows1['donator_id'];
+        if($don_id==$dl_id){
+            $arr[$i][$j]=2;
+            $w[$i]+=$rows1['quantity'];
+        }
+        else{
+            $arr[$i][$j]=1;
+        }
+}}
+$j=0;
+}$i=0;$j=0;}
+   $dm=array();
+    
+   
+    for($i=1;$i<=$m;$i++){
+        $dm[$i]=0;
+        for($j=1;$j<=$n;$j++){
+           
+        $dm[$i]+=(($arr[$i][$j])*($arr[$i][$j]));
+        }
+        $dm[$i]=sqrt($dm[$i]);
+       
+    }
+    
+    $sdm=array();
+    for($i=1;$i<=$m;$i++){
+        for($j=1;$j<=$n;$j++){
+         $sdm[$i][$j]=$arr[$i][$j]/$dm[$i];
+        }
+    }
+    $wsdm=array();
+    $is=array();
+    $nis=array();
+    for($i=1;$i<=$m;$i++){
+        for($j=1;$j<=$n;$j++){
+            $wsdm[$i][$j]=$sdm[$i][$j]*$w[$i];
+        }
+    }
+   
+    for($i=1;$i<=$m;$i++){
+        $is[$i]=max($wsdm[$i]);
+        $nis[$i]=min($wsdm[$i]);
+    }
+   
+    $sis=array();
+    $nsis=array();
+    $tis=array();
+    $tnis=array();
+    for($i=1;$i<=$m;$i++){
+
+        for($j=1;$j<=$n;$j++){
+            $tis[$j]=0;
+            $tnis[$j]=0;
+            $sis[$i][$j]=($wsdm[$i][$j]-$is[$i])*($wsdm[$i][$j]-$is[$i]);
+            $snis[$i][$j]=($wsdm[$i][$j]-$nis[$i])*($wsdm[$i][$j]-$nis[$i]);
+        }
+    }
+   
+    for($j=1;$j<=$n;$j++){
+    for($i=1;$i<=$m;$i++){
+       
+            $tis[$j]+=$sis[$i][$j];
+            $tnis[$j]+=$sis[$i][$j];
+        }
+    }
+    for($j=1;$j<=$n;$j++){
+        $tis[$j]=sqrt($tis[$j]);
+        $tnis[$j]=sqrt($tnis[$j]);
+    }
+    $fin=array();
+    for($j=1;$j<=$n;$j++){
+        $fin[$j]=($tis[$j]+$tnis[$j]);
+        $sql3="UPDATE requestlist SET preforder='$fin[$j]' WHERE request_id=$j";
+        $query3=mysqli_query($db,$sql3);
+
+    }
+    $sql4="SELECT * FROM requestlist where status='na'";
+    $query4=mysqli_query($db,$sql4);
+    if(mysqli_num_rows($query4)>0){
+    while ($rows4=mysqli_fetch_assoc($query4)) {
+        $ro=$rows4['request_id'];
+        $ord=$fin[array_rand($fin)];
+        $sql5="UPDATE requestlist SET preforder='$ord' WHERE request_id='$ro'";
+        $query5=mysqli_query($db,$sql5);
+   
+    }}
+   
