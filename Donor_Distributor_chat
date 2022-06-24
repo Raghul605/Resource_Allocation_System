@@ -1,0 +1,92 @@
+<?php 
+session_start();
+isset($_SESSION["email"]);
+ISSET($_SESSION["slot_d"]);
+include("navbar.php");
+$disb_id=$_SESSION['user_id'];
+
+?>
+
+<?php 
+include("config/config.php");
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    table, th, td {
+  border: 2px solid black;
+  text-align: center;
+  padding: 10px;
+  width: 100px;
+  margin-top: 10px;
+  
+}
+
+    .card {
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+      max-width: 100%;
+      min-width: 100%;
+      margin: auto;
+      text-align: center;
+      font-family: arial;
+      display: inline;
+    }
+
+    .card:hover {
+      box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+      opacity: 0.8;
+    }
+
+    .container {
+      padding: 2px 16px;
+    }
+
+    .btn {
+      width: 100%;
+    }
+
+    .image {
+      min-width: 100%;
+      min-height: 200px;
+      max-width: 100%;
+      max-height:200px;
+    }
+  </style>
+</head>
+<body style="background-color: #fff">
+ <h2>Donator List</h2>
+  <div class="row">
+    <?php 
+    $sql="SELECT * FROM donatelist INNER JOIN donator on donator.donator_id=donatelist.donator_id WHERE distributor_id=$disb_id GROUP BY donatelist.donator_id";
+   
+    $query=mysqli_query($db,$sql);
+
+    if(mysqli_num_rows($query)>0)
+    {
+      while ($rows=mysqli_fetch_assoc($query)) {
+
+
+        ?>
+
+        <div class="col-sm-2">
+          <div class="card" style="margin-right: 10%">
+             <table style="width:200px;margin-left:30px " >
+              <td><h5><?php echo $rows['full_name'] ?></h5> 
+              <h5>Mobile:&nbsp;<b style="color:red"><?php echo $rows['phone'] ?></b></h5> 
+              <h6>Email:<?php echo $rows['email'] ?></h6> 
+              <h6>Address:<?php echo $rows['address'] ?></h6>
+		<a class='btn btn-success' href="donchat.php?donid=<?php echo $rows['donator_id']; ?>">chat</a></td>
+
+
+            </table>
+          </div>
+        </div>
+
+      <?php }}else{  ?>
+	<center><h1>No Donator Available</h1></center>
+	<?php } ?>
+    </div>
+</body>
